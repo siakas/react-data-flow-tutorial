@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { Layout } from "@/components/Layout";
-import { CounterButton } from "@/features/components/counter/CounterButton";
-import { CounterDisplay } from "@/features/components/counter/CounterDisplay";
+import { CounterButton } from "@/features/counter/components/CounterButton";
+import { CounterDisplay } from "@/features/counter/components/CounterDisplay";
 
 export default function Tutorial1Page() {
   // 親コンポーネントが状態を管理
