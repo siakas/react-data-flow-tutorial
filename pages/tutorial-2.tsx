@@ -4,6 +4,7 @@ import { Karantina } from "next/font/google";
 import { Layout } from "@/components/Layout";
 import { DataFlowDiagram } from "@/features/todo/components/DataFlowDiagram";
 import { TodoInput } from "@/features/todo/components/TodoInput";
+import { TodoStats } from "@/features/todo/components/TodoStats";
 import { FilterType, SortType, Todo } from "@/features/todo/types";
 
 export default function Tutorial2Page() {
@@ -48,6 +49,12 @@ export default function Tutorial2Page() {
           <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
             <h2 className="mb-4 text-lg font-semibold">新しい TODO を追加</h2>
             <TodoInput onAddTodo={handleAddTodo} />
+          </div>
+
+          {/* 統計コンポーネント：親からデータを受け取って表示 */}
+          <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <h2 className="mb-4 text-lg font-semibold">統計情報</h2>
+            <TodoStats todos={todos} />
           </div>
 
           {/* 仮：Todo リスト */}
