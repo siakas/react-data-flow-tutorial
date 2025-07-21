@@ -1,15 +1,17 @@
+import Link from "next/link";
+
 import { Layout } from "@/components/Layout";
 
 export default function Home() {
   return (
     <Layout>
-      <div>Home</div>
-      <p>
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus
-        eaque fuga, nam dignissimos obcaecati impedit consequuntur! Minima
-        ratione laboriosam, corporis modi dolorum, perferendis omnis, voluptatem
-        similique tempore quod cum eos.
-      </p>
+      <ul className="p-10">
+        <li>
+          <Link href="/tutorial-1" className="text-blue-600 hover:underline">
+            チュートリアル①
+          </Link>
+        </li>
+      </ul>
     </Layout>
   );
 }
