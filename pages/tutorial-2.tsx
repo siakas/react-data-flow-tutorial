@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Karantina } from "next/font/google";
 
 import { Layout } from "@/components/Layout";
+import { DataFlowDiagram } from "@/features/todo/components/DataFlowDiagram";
 import { TodoInput } from "@/features/todo/components/TodoInput";
 import { FilterType, SortType, Todo } from "@/features/todo/types";
 
@@ -35,6 +36,13 @@ export default function Tutorial2Page() {
           <h1 className="mb-8 text-center text-3xl font-bold">
             親子間データフロー：発展編
           </h1>
+
+          {/* データフローの可視化 */}
+          <DataFlowDiagram
+            todosCount={todos.length}
+            activeFilter={filter}
+            activeSort={sortBy}
+          />
 
           {/* 入力コンポーネント：親にデータを送る */}
           <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
