@@ -16,7 +16,7 @@ export const TodoInput = ({ onAddTodo }: Props) => {
     e.preventDefault();
 
     if (title.trim()) {
-      console.log("TodoIinput：親に新しいTODOを送信します");
+      console.log("TodoInput: 親に新しいTODOを送信します");
 
       // 親に「こんな TODO を追加して」と依頼
       // 実際の追加処理は親がおこなう
