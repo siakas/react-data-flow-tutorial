@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Karantina } from "next/font/google";
+import { useMemo, useState } from "react";
 
 import { Layout } from "@/components/Layout";
 import { DataFlowDiagram } from "@/features/todo/components/DataFlowDiagram";
+import { TodoFilter } from "@/features/todo/components/TodoFilter";
 import { TodoInput } from "@/features/todo/components/TodoInput";
 import { TodoList } from "@/features/todo/components/TodoList";
 import { TodoStats } from "@/features/todo/components/TodoStats";
@@ -77,6 +77,40 @@ export default function Tutorial2Page() {
     });
   };
 
+  // フィルタリングとソート
+  // フィルタリングとソートは計算コストが高いので、依存する値が変わった時だけ再計算する
+  const filteredAndSortedTodos = useMemo(() => {
+    console.log("親: フィルタリングとソートを実行");
+
+    // ステップ1：フィルタリング
+    let filtered = todos;
+    if (filter === "active") {
+      filtered = todos.filter((todo) => !todo.isCompleted);
+      console.log("親: 未完了の TODO のみ表示：", filtered.length);
+    } else if (filter === "completed") {
+      filtered = todos.filter((todo) => todo.isCompleted);
+      console.log("親: 完了した TODO のみ表示：", filtered.length);
+    }
+
+    // ステップ2：ソート
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "date":
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        case "priority":
+          const priorityOrder = { high: 0, medium: 1, low: 2 };
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        case "alphabetical":
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
+
+    console.log("親: ソート完了:", sortBy);
+    return sorted;
+  }, [todos, filter, sortBy]);
+
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50">
@@ -110,17 +144,37 @@ export default function Tutorial2Page() {
             <TodoStats todos={todos} />
           </div>
 
+          {/* フィルターコンポーネント：ユーザーの選択を親に伝え、現在の選択状態を表示 */}
+          <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+              <span className="text-2xl">🔍</span>
+              フィルターと並び替え
+            </h2>
+            <TodoFilter
+              currentFilter={filter}
+              currentSort={sortBy}
+              onFilterChange={(newFilter) => {
+                console.log("親: フィルターを変更:", newFilter);
+                setFilter(newFilter);
+              }}
+              onSortChange={(newSort) => {
+                console.log("親: ソート順を変更:", newSort);
+                setSortBy(newSort);
+              }}
+            />
+          </div>
+
           {/* リストコンポーネント：フィルター済みのデータを表示し、各種操作を親に伝達 */}
           <div className="rounded-lg bg-white p-6 shadow-md">
             <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
               <span className="text-2xl">📋</span>
               TODOリスト
               <span className="text-sm font-normal text-gray-600">
-                （○○件表示中）
+                （{filteredAndSortedTodos.length}件表示中）
               </span>
             </h2>
             <TodoList
-              todos={todos}
+              todos={filteredAndSortedTodos}
               onToggle={handleToggleTodo}
               onDelete={handleDeleteTodo}
               onEdit={handleEditTodo}
