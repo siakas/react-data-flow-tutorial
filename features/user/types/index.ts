@@ -9,8 +9,8 @@ export type User = {
   status: UserStatus;
   department: string;
   skills: string[];
-  joinedAt: string;
-  lastActiveAt: string;
+  joinedAt: Date;
+  lastActiveAt: Date;
   avatar?: string;
 };
 
