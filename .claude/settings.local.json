@@ -4,7 +4,10 @@
       "Bash(pnpm run:*)",
       "Bash(git add:*)",
       "Bash(git push:*)",
-      "Bash(gh pr create:*)"
+      "Bash(gh pr create:*)",
+      "Bash(pnpm lib:update:*)",
+      "Bash(pnpm update:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }
