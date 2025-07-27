@@ -6,8 +6,9 @@
 
 このプロジェクトは **React データフロー学習チュートリアル** です。React の親子間データフローを理解するための教育的なリポジトリで、以下の学習内容を含みます：
 
-- **チュートリアル①** (`tutorial-1.tsx`): 基本的なカウンターアプリを通じた親→子、子→親のデータフロー
-- **チュートリアル②** (`tutorial-2.tsx`): より複雑なTODOアプリを通じた実践的なデータフロー
+- **基礎編** (`counter.tsx`): 基本的なカウンターアプリを通じた親→子、子→親のデータフロー
+- **発展編** (`todo.tsx`): より複雑なTODOアプリを通じた実践的なデータフロー
+- **実践編** (`user.tsx`): Zustand を使用したグローバル状態管理と親子データフローのハイブリッドアーキテクチャ
 
 ### 学習ポイント
 
@@ -16,6 +17,9 @@
 - `props` を通じたデータの受け渡し
 - `onXxx` パターンでのイベント通知
 - 関心の分離（子は通知のみ、親が実際の処理を担当）
+- Zustand によるグローバル状態管理
+- ローカル状態とグローバル状態の使い分け
+- ハイブリッドアーキテクチャの実装パターン
 
 ## Conversation Guidelines
 
@@ -27,17 +31,39 @@
 
 ```
 features/
-├── counter/          # チュートリアル① 用コンポーネント
+├── counter/          # 基礎編用コンポーネント
 │   └── components/
-├── todo/             # チュートリアル② 用コンポーネント
+│       ├── CounterButton.tsx
+│       └── CounterDisplay.tsx
+├── todo/             # 発展編用コンポーネント
 │   ├── components/
+│   │   ├── DataFlowDiagram.tsx
+│   │   ├── TodoFilter.tsx
+│   │   ├── TodoInput.tsx
+│   │   ├── TodoItem.tsx
+│   │   ├── TodoList.tsx
+│   │   └── TodoStats.tsx
 │   └── types/
+│       └── index.ts
+├── user/             # 実践編用コンポーネント
+│   ├── components/
+│   │   ├── UserCard.tsx
+│   │   ├── UserFilters.tsx
+│   │   ├── UserList.tsx
+│   │   └── UserModal.tsx
+│   ├── stores/
+│   │   └── UserStore.ts
+│   └── types/
+│       └── index.ts
 components/           # 共通コンポーネント
 ├── ui/               # shadcn/ui コンポーネント
+│   └── button.tsx
 └── Layout.tsx        # レイアウトコンポーネント
 pages/                # Next.js Pages
-├── tutorial-1.tsx    # 基礎編
-└── tutorial-2.tsx    # 発展編
+├── counter.tsx       # 基礎編
+├── todo.tsx          # 発展編
+├── user.tsx          # 実践編
+└── index.tsx         # ホームページ
 ```
 
 ## インポートエイリアス
@@ -51,6 +77,7 @@ pages/                # Next.js Pages
 - ESLint 設定には React 固有のルールと Prettier 統合が含まれる
 - Prettier の設定に従う（`.prettierrc` 参照）
 - インポート順序は Prettier プラグインで自動整列される
+- pnpm をパッケージマネージャーとして使用
 
 ### React/TypeScript
 
@@ -216,10 +243,12 @@ export const ChildComponent = ({ count, onIncrement }: Props) => {
 
 ### 状態管理
 
-- React Context は最小限に留める
 - ローカル状態は useState/useReducer を使用
-- グローバル状態が必要な場合は Context を検討
-- **教育目的のため、外部状態管理ライブラリは使用しない**
+- グローバル状態管理には Zustand を使用
+- **状態の責務を明確に分離**：
+  - UI状態（表示モード、フィルター条件など）→ ローカル状態
+  - アプリケーション状態（ユーザー情報、選択状態など）→ グローバル状態
+- React Context は最小限に留める
 
 ### Next.js 固有
 
@@ -301,6 +330,111 @@ export const ChildComponent = ({ count, onIncrement }: Props) => {
 - パフォーマンス問題がある場合は、不要な Client Components を確認
 - データフローが期待通りに動作しない場合は、コンソールログで流れを追跡
 
+## ライブラリとツール
+
+### 使用ライブラリ
+
+- **フレームワーク**: Next.js 15.4.2（React 19.1.0）
+- **状態管理**: Zustand 5.0.6
+- **スタイリング**: Tailwind CSS v4.1.11
+- **UI コンポーネント**: Radix UI（@radix-ui/react-slot）
+- **アイコン**: Lucide React
+- **ユーティリティ**: 
+  - clsx（条件付きクラス）
+  - tailwind-merge（クラスのマージ）
+  - class-variance-authority（バリアント管理）
+
+### 開発ツール
+
+- **TypeScript**: 5.8.3（strict モード有効）
+- **ESLint**: 9.32.0（Next.js設定 + Prettier統合）
+- **Prettier**: 3.6.2（Tailwind CSS プラグイン含む）
+- **パッケージマネージャー**: pnpm
+- **Node.js**: 22.17.0（Volta で管理）
+
+### 開発コマンド
+
+```bash
+# 開発サーバー起動
+pnpm dev
+
+# プロダクションビルド
+pnpm build
+
+# リント実行
+pnpm lint
+
+# フォーマット実行
+pnpm format
+
+# ライブラリアップデート（インタラクティブ）
+pnpm lib:update
+```
+
+## Zustand 使用ガイドライン
+
+### ストア設計原則
+
+- **単一責任**: 1つのストアは1つの関心事を担当
+- **最小限の状態**: 必要最小限の状態のみを保持
+- **派生状態の回避**: 計算可能な値はセレクターで取得
+
+### ストア実装パターン
+
+```tsx
+// stores/UserStore.ts
+import { create } from 'zustand';
+
+type UserState = {
+  // 状態
+  users: User[];
+  selectedUser: User | null;
+  isModalOpen: boolean;
+  
+  // アクション
+  setUsers: (users: User[]) => void;
+  selectUser: (user: User) => void;
+  openModal: () => void;
+  closeModal: () => void;
+};
+
+export const useUserStore = create<UserState>((set) => ({
+  // 初期状態
+  users: [],
+  selectedUser: null,
+  isModalOpen: false,
+  
+  // アクション実装
+  setUsers: (users) => set({ users }),
+  selectUser: (user) => set({ selectedUser: user }),
+  openModal: () => set({ isModalOpen: true }),
+  closeModal: () => set({ isModalOpen: false, selectedUser: null }),
+}));
+```
+
+### ストア使用パターン
+
+```tsx
+// コンポーネントでの使用
+const Component = () => {
+  // 必要な状態とアクションのみを選択
+  const users = useUserStore((state) => state.users);
+  const selectUser = useUserStore((state) => state.selectUser);
+  
+  // ローカル状態との組み合わせ
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  return (
+    <div>
+      {/* グローバル状態を使用 */}
+      {users.map(user => (
+        <UserCard key={user.id} user={user} onSelect={selectUser} />
+      ))}
+    </div>
+  );
+};
+```
+
 ## 追加の規則
 
 - コミットメッセージは簡潔で分かりやすく
@@ -308,3 +442,4 @@ export const ChildComponent = ({ count, onIncrement }: Props) => {
 - 教育的な価値を重視し、学習者にとって理解しやすいコードを書く
 - アニメーションは控えめに使用し、`prefers-reduced-motion` を尊重
 - 実装例には必ず学習ポイントを明記する
+- Zustand の使用時は状態の責務分離を明確にする
