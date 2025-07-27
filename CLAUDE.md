@@ -2,9 +2,43 @@
 
 このファイルは、Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイダンスを提供します。
 
+## プロジェクトについて
+
+このプロジェクトは **React データフロー学習チュートリアル** です。React の親子間データフローを理解するための教育的なリポジトリで、以下の学習内容を含みます：
+
+- **チュートリアル①** (`tutorial-1.tsx`): 基本的なカウンターアプリを通じた親→子、子→親のデータフロー
+- **チュートリアル②** (`tutorial-2.tsx`): より複雑なTODOアプリを通じた実践的なデータフロー
+
+### 学習ポイント
+
+- 単一方向データフローの理解
+- 状態管理は親コンポーネントで行う理由
+- `props` を通じたデータの受け渡し
+- `onXxx` パターンでのイベント通知
+- 関心の分離（子は通知のみ、親が実際の処理を担当）
+
 ## Conversation Guidelines
 
 - 常に日本語で会話する
+- 教育的な観点から、データフローの説明を重視する
+- コンソールログを活用してデータの流れを可視化する
+
+## ディレクトリ構造
+
+```
+features/
+├── counter/          # チュートリアル① 用コンポーネント
+│   └── components/
+├── todo/             # チュートリアル② 用コンポーネント
+│   ├── components/
+│   └── types/
+components/           # 共通コンポーネント
+├── ui/               # shadcn/ui コンポーネント
+└── Layout.tsx        # レイアウトコンポーネント
+pages/                # Next.js Pages
+├── tutorial-1.tsx    # 基礎編
+└── tutorial-2.tsx    # 発展編
+```
 
 ## インポートエイリアス
 
@@ -25,6 +59,12 @@
 - TypeScript strict モードが有効
 - 関数コンポーネントを優先する
 - Props の型定義は明示的に行う
+
+### データフロー関連の命名規則
+
+- 親から子へ渡すイベントハンドラ: `onXxx` （例: `onAddTodo`, `onToggle`）
+- 親コンポーネント内のハンドラ: `handleXxx` （例: `handleAddTodo`, `handleToggle`）
+- 子コンポーネント内のハンドラ: `handleXxx` （例: `handleSubmit`, `handleClick`）
 
 ### Tailwind CSS v4
 
@@ -57,9 +97,9 @@
 
 ### 命名規則
 
-- コンポーネント: PascalCase（例: `ThemeToggle`）
+- コンポーネント: PascalCase（例: `CounterButton`, `TodoItem`）
 - ファイル名: PascalCase.tsx
-- Props 型: `ComponentNameProps`
+- Props 型: `ComponentNameProps` または `Props`
 - フック: `use` プレフィックス
 
 ### コンポーネント構造
@@ -69,13 +109,64 @@
 import { ComponentProps } from "react";
 
 // 2. 型定義
-type ComponentNameProps = {
-  // ...
+type Props = {
+  // データフロー関連の Props
+  count: number; // 親から受け取るデータ
+  onIncrement: () => void; // 親に通知するための関数
 };
 
 // 3. コンポーネント定義（名前付きエクスポート推奨）
-export const ComponentName = (props: ComponentNameProps) => {
-  // ...
+export const ComponentName = ({ count, onIncrement }: Props) => {
+  // 内部ハンドラ（親の関数を呼び出すだけ）
+  const handleIncrement = () => {
+    console.log("子: インクリメントボタンがクリックされました");
+    onIncrement(); // 親に通知
+  };
+
+  return <button onClick={handleIncrement}>カウント: {count}</button>;
+};
+```
+
+### データフロー実装のベストプラクティス
+
+#### 親コンポーネント
+
+```tsx
+export default function ParentComponent() {
+  // 状態は親で管理
+  const [count, setCount] = useState(0);
+
+  // 子に渡すハンドラ関数
+  const handleIncrement = () => {
+    console.log("親: カウントを増やします");
+    setCount((prev) => prev + 1);
+  };
+
+  return <ChildComponent count={count} onIncrement={handleIncrement} />;
+}
+```
+
+#### 子コンポーネント
+
+```tsx
+type Props = {
+  count: number;
+  onIncrement: () => void;
+};
+
+export const ChildComponent = ({ count, onIncrement }: Props) => {
+  // 子は親から受け取った関数を実行するだけ
+  const handleClick = () => {
+    console.log("子: 親に通知します");
+    onIncrement(); // 実際の処理は親が担当
+  };
+
+  return (
+    <div>
+      <p>現在のカウント: {count}</p>
+      <button onClick={handleClick}>増やす</button>
+    </div>
+  );
 };
 ```
 
@@ -85,6 +176,27 @@ export const ComponentName = (props: ComponentNameProps) => {
 - 複雑なロジックはカスタムフックに抽出
 - `clsx` を使用して条件付きクラスを管理
 - アクセシビリティ属性（aria-label など）を適切に設定
+- コンソールログでデータフローを可視化（学習目的）
+
+## 学習コンテンツ特有の注意事項
+
+### デバッグとロギング
+
+- 各コンポーネントでコンソールログを活用してデータの流れを明示
+- 「親:」「子:」のプレフィックスでログの出力元を明確化
+- イベントの発生順序が追跡できるようにする
+
+### 教育的な説明コメント
+
+- 複雑なデータフローには詳細なコメントを追加
+- 「なぜこの設計にするのか」の理由を明記
+- 初学者にもわかりやすい説明を心がける
+
+### UI での説明表示
+
+- データフローを可視化するための説明用UIを積極的に配置
+- 現在の状態やフローの説明をユーザーに表示
+- 学習効果を高めるための補助情報を提供
 
 ## Tailwind CSS v4 特有の注意点
 
@@ -107,6 +219,7 @@ export const ComponentName = (props: ComponentNameProps) => {
 - React Context は最小限に留める
 - ローカル状態は useState/useReducer を使用
 - グローバル状態が必要な場合は Context を検討
+- **教育目的のため、外部状態管理ライブラリは使用しない**
 
 ### Next.js 固有
 
@@ -115,11 +228,12 @@ export const ComponentName = (props: ComponentNameProps) => {
 - 画像最適化には next/image を使用
 - フォントは next/font/local で最適化
 
-### テーマ切り替え
+### データフロー設計
 
-- localStorage でテーマ設定を永続化
-- SSR/SSG 時のちらつきを防ぐため、スクリプトタグで初期化
-- system/light/dark の 3 つのモードをサポート
+- 状態は常に適切な親レベルで管理
+- 子コンポーネントは純粋関数として設計
+- プロップドリリングが深くなる場合は構造を見直す
+- イベントバブリングの概念を活用
 
 ## プルリクエスト作成ガイドライン
 
@@ -131,7 +245,7 @@ export const ComponentName = (props: ComponentNameProps) => {
 
 #### パターン1: 新規ブランチから作成する場合
 
-1. フィーチャーブランチを作成（例: `feature/add-navigation-menu`）
+1. フィーチャーブランチを作成（例: `feature/add-tutorial-3`）
 2. 変更をコミット（意味のあるコミットメッセージを使用）
 3. プルリクエストのタイトルは変更内容を簡潔に表現
 4. 本文は必ずテンプレートのすべてのセクションを埋める
@@ -168,7 +282,7 @@ export const ComponentName = (props: ComponentNameProps) => {
 
 ### ブランチ命名規則
 
-- 機能追加: `feature/機能名`
+- 機能追加: `feature/機能名` または `tutorial/チュートリアル名`
 - バグ修正: `fix/修正内容`
 - ドキュメント: `docs/更新内容`
 - リファクタリング: `refactor/対象`
@@ -177,7 +291,7 @@ export const ComponentName = (props: ComponentNameProps) => {
 ### コミットメッセージ
 
 - 日本語または英語で記述
-- 動詞から始める（例: "Add navigation menu", "ナビゲーションメニューを追加"）
+- 動詞から始める（例: "Add tutorial-3", "チュートリアル3を追加"）
 - 変更理由も含める場合は、本文に記述
 
 ## デバッグとトラブルシューティング
@@ -185,10 +299,12 @@ export const ComponentName = (props: ComponentNameProps) => {
 - Tailwind CSS v4 のクラスが適用されない場合は、PostCSS の設定を確認
 - ダークモードが機能しない場合は、`@variant dark` の定義を確認
 - パフォーマンス問題がある場合は、不要な Client Components を確認
+- データフローが期待通りに動作しない場合は、コンソールログで流れを追跡
 
 ## 追加の規則
 
 - コミットメッセージは簡潔で分かりやすく
 - 新機能追加時は既存のパターンに従う
-- ドキュメントサイトとしての読みやすさを重視
+- 教育的な価値を重視し、学習者にとって理解しやすいコードを書く
 - アニメーションは控えめに使用し、`prefers-reduced-motion` を尊重
+- 実装例には必ず学習ポイントを明記する
