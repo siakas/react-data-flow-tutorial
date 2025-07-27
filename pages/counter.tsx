@@ -4,7 +4,7 @@ import { Layout } from "@/components/Layout";
 import { CounterButton } from "@/features/counter/components/CounterButton";
 import { CounterDisplay } from "@/features/counter/components/CounterDisplay";
 
-export default function Tutorial1Page() {
+export default function CounterPage() {
   // 親コンポーネントが状態を管理
   const [count, setCount] = useState(0);
 

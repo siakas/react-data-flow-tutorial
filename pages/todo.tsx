@@ -8,7 +8,7 @@ import { TodoList } from "@/features/todo/components/TodoList";
 import { TodoStats } from "@/features/todo/components/TodoStats";
 import { FilterType, SortType, Todo } from "@/features/todo/types";
 
-export default function Tutorial2Page() {
+export default function TodoPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
   const [sortBy, setSortBy] = useState<SortType>("date");

@@ -1,0 +1,67 @@
+import { useState } from "react";
+
+import { Layout } from "@/components/Layout";
+import { UserFilters } from "@/features/user/components/UserFilters";
+import { UserList } from "@/features/user/components/UserList";
+import { UserModal } from "@/features/user/components/UserModal";
+import { useUserStore } from "@/features/user/stores/UserStore";
+
+export default function UserPage() {
+  // ローカル状態（UI）
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showDataFlow, setShowDataFlow] = useState(true);
+
+  // グローバル状態（Zustand）
+  const isModalOpen = useUserStore((state) => state.isModalOpen);
+  const selectedUser = useUserStore((state) => state.selectedUser);
+
+  return (
+    <Layout>
+      <div className="min-h-screen bg-gray-50">
+        <div className="mx-auto max-w-7xl px-4 py-8">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold">
+              Zustand × 親子データフロー：ユーザー管理システム
+            </h1>
+            <p className="mt-2 text-gray-600">
+              グローバル状態と親子間通信のハイブリッドアーキテクチャ
+            </p>
+          </header>
+
+          {/* データフローの可視化 */}
+          {/* 可視化コンポーネント */}
+
+          {/* 統計情報 */}
+          {/* スタッツコンポーネント */}
+
+          {/* フィルターセクション */}
+          <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
+            <UserFilters />
+          </div>
+
+          {/* メインコンテンツ */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* ユーザーリスト */}
+            <div className="lg:col-span-2">
+              <UserList viewMode={viewMode} onViewModeChange={setViewMode} />
+            </div>
+
+            {/* ユーザー詳細 */}
+            <div className="lg:col-span-1">
+              {selectedUser ? (
+                <div>ユーザー詳細</div>
+              ) : (
+                <div className="rounded-lg bg-white p-6 text-center text-gray-500 shadow-md">
+                  ユーザーを選択してください
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* モーダル */}
+          {isModalOpen && <UserModal />}
+        </div>
+      </div>
+    </Layout>
+  );
+}
