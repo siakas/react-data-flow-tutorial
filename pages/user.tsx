@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { UserFilters } from "@/features/user/components/UserFilters";
 import { UserList } from "@/features/user/components/UserList";
 import { UserModal } from "@/features/user/components/UserModal";
+import { UserStats } from "@/features/user/components/UserStats";
 import { useUserStore } from "@/features/user/stores/UserStore";
 
 export default function UserPage() {
@@ -32,7 +33,7 @@ export default function UserPage() {
           {/* 可視化コンポーネント */}
 
           {/* 統計情報 */}
-          {/* スタッツコンポーネント */}
+          <UserStats />
 
           {/* フィルターセクション */}
           <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
