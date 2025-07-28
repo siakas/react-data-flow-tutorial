@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Layout } from "@/components/Layout";
+import { DataFlowVisualization } from "@/features/user/components/DataFlowVisualization";
 import { UserFilters } from "@/features/user/components/UserFilters";
 import { UserList } from "@/features/user/components/UserList";
 import { UserModal } from "@/features/user/components/UserModal";
@@ -30,7 +31,9 @@ export default function UserPage() {
           </header>
 
           {/* データフローの可視化 */}
-          {/* 可視化コンポーネント */}
+          {showDataFlow && (
+            <DataFlowVisualization onClose={() => setShowDataFlow(false)} />
+          )}
 
           {/* 統計情報 */}
           <UserStats />
