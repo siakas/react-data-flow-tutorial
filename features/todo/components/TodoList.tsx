@@ -36,6 +36,4 @@ export const TodoList = ({ todos, onToggle, onDelete, onEdit }: Props) => {
       ))}
     </div>
   );
-
-  return <div>Enter</div>;
 };
